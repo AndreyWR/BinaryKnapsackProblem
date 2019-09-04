@@ -22,17 +22,24 @@ public class Knapsack {
     private ArrayList<Integer> costs;       // Custos.
     private ArrayList<Float> cb;            // Custo-Benefício de cada item.
     private float tcb;                      // Custo-Benefício total.
+    private ArrayList<Integer> index;       // Indices dos itens 
     
-    static String file = "C:\\Users\\Sharkb8i\\Desktop\\FACUL\\PAA\\TRABALHO2\\Proposta 3\\Mochila10.txt";
+    //static String file = "C:\\Users\\Sharkb8i\\Desktop\\FACUL\\PAA\\TRABALHO2\\Proposta 3\\Mochila10.txt";
+    static String file = "D:\\Aulas\\PAA\\trab2\\Proposta 3\\Mochila10.txt";
     
     public Knapsack() {
         this.knapsack = new ArrayList();
         this.benefits = new ArrayList();
         this.costs = new ArrayList();
         this.cb = new ArrayList();
+        this.index = new ArrayList();
     }
     
     /*** SETTERS ***/
+    public void setIndex(int index){
+        this.index.add(index);
+    }
+    
     public void setCapacity(int capacity) {
         this.capacity = capacity;
     }
@@ -58,6 +65,10 @@ public class Knapsack {
     }
     
     /*** GETTERS ***/
+    public ArrayList<Integer> getIndex(){
+        return this.index;
+    }
+    
     public int getCapacity() {
         return this.capacity;
     }
@@ -90,18 +101,23 @@ public class Knapsack {
      * Implementação estratégia gulosa sem ordenação
      */
     public static void GreedyStrategy(Knapsack k) throws IOException {
-        ArrayList<Integer> costs = k.getCosts();
-        ArrayList<Float> benefitPerCost = k.getBenefitPerCost();
+        //ArrayList<Integer> costs = k.getCosts();
+        //ArrayList<Float> benefitPerCost = k.getBenefitPerCost();
+        List<Integer> costs = new ArrayList<>(k.getCosts());
+        List<Float> benefitPerCost = new ArrayList<>(k.getBenefitPerCost());
         float largest = 0;
         int counter = 0, index = 0;
+        int id = 0;
         
         while(counter < k.getBenefits().size() && k.getCapacity() > k.getTotalBenefitPerCost()) {
             
             for(int i = 0; i < benefitPerCost.size(); i++) {
                 // System.out.println("benefitPerCost.get: " + benefitPerCost.get(i));
+                
                 if(benefitPerCost.get(i) > largest) {
                     //System.out.println(benefitPerCost.get(i));
                     index = i;
+                    id = k.getIndex().get(i);
                     largest = benefitPerCost.get(i);
                 }
             }
@@ -115,7 +131,7 @@ public class Knapsack {
             System.out.println("Cost    : " + costs.get(index) + "\n");
             */
             
-            k.setItem(index);
+            k.setItem(id);
             k.setTotalBenefitPerCost(k.getTotalBenefitPerCost() + costs.get(index));
             costs.set(index, -1);
             //costs.set(index, costs.get(index)*(-1));
@@ -179,6 +195,18 @@ public class Knapsack {
         float temp = k.getBenefitPerCost().get(start);
         k.getBenefitPerCost().set(start, k.getBenefitPerCost().get(end));
         k.getBenefitPerCost().set(end, temp);
+        
+        int tp = k.getBenefits().get(start);
+        k.getBenefits().set(start, k.getBenefits().get(end));
+        k.getBenefits().set(end, tp);
+        
+        tp = k.getCosts().get(start);
+        k.getCosts().set(start, k.getCosts().get(end));
+        k.getCosts().set(end, tp);
+        
+        tp = k.getIndex().get(start);
+        k.getIndex().set(start, k.getIndex().get(end));
+        k.getIndex().set(end, tp);
     }
     
     /**
@@ -221,6 +249,9 @@ public class Knapsack {
             count++;
         }
         
+        for(int i=1; i<=k.getBenefits().size(); i++)
+            k.setIndex(i);
+        
         /*
          *   Cálculos (Custo-Benefício)
          */
@@ -231,6 +262,7 @@ public class Knapsack {
         System.out.println("Benefits : " + k.getBenefits());
         System.out.println("Costs    : " + k.getCosts());
         System.out.println("CB       : " + k.getBenefitPerCost());
+        System.out.println("Index    : " + k.getIndex());
         
         /*
          *   Otimização (utilizando QuickSort)
@@ -238,6 +270,9 @@ public class Knapsack {
         QuickSort(k, 0, k.getBenefitPerCost().size()-1);
         System.out.println("\nOrdering CB...");
         System.out.println("CB       : " + k.getBenefitPerCost());
+        System.out.println("Benefits : " + k.getBenefits());
+        System.out.println("Costs    : " + k.getCosts());
+        System.out.println("Index    : " + k.getIndex());
         
         /*
          *   Programação Gulosa
