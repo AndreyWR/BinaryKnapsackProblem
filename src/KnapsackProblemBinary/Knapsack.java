@@ -264,6 +264,15 @@ public class Knapsack {
         System.out.println("CB       : " + k.getBenefitPerCost());
         System.out.println("Index    : " + k.getIndex());
         
+        GreedyStrategy(k);
+        System.out.println("\nFirst Greedy...");
+        System.out.println("CB       : " + k.getBenefitPerCost());
+        System.out.println("Benefits : " + k.getBenefits());
+        System.out.println("Costs    : " + k.getCosts());
+        System.out.println("Index    : " + k.getIndex());
+        System.out.println("Total    : " + k.getTotalBenefitPerCost());
+        k.setTotalBenefitPerCost(0);
+        
         /*
          *   Otimização (utilizando QuickSort)
          */
@@ -282,6 +291,7 @@ public class Knapsack {
         System.out.println("\nCB       : " + k.getBenefitPerCost());
         System.out.println("Items    : " + k.getItems());
         System.out.println("Total    : " + k.getTotalBenefitPerCost());
+        System.out.println("Index    : " + k.getIndex());
         
         //  HOW TO COUNT THE TIME:
         
