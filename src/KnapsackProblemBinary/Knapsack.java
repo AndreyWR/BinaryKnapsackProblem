@@ -1,19 +1,20 @@
 package KnapsackProblemBinary;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
-import java.util.function.Consumer;
 
 /**
  *
- * @author Sharkb8i
+ * @author andrey
  */
 public class Knapsack {
     private int capacity;                   // Capacidade da mochila.
@@ -23,9 +24,12 @@ public class Knapsack {
     private ArrayList<Float> cb;            // Custo-Benefício de cada item.
     private float tcb;                      // Custo-Benefício total.
     private ArrayList<Integer> index;       // Indices dos itens 
+    int swaps;
+    int comparisons;
     
     //static String file = "C:\\Users\\Sharkb8i\\Desktop\\FACUL\\PAA\\TRABALHO2\\Proposta 3\\Mochila10.txt";
-    static String file = "D:\\Aulas\\PAA\\trab2\\Proposta 3\\Mochila10.txt";
+    //static String file = "D:\\Aulas\\PAA\\trab2\\Proposta 3\\Mochila10.txt";
+    static String file = "C:\\Users\\andre\\OneDrive\\Documents\\Aula\\PAA\\BinaryKnapsackProblem-master\\Mochila3000.txt";
     
     public Knapsack() {
         this.knapsack = new ArrayList();
@@ -33,6 +37,8 @@ public class Knapsack {
         this.costs = new ArrayList();
         this.cb = new ArrayList();
         this.index = new ArrayList();
+        swaps=0;
+        comparisons=0;
     }
     
     /*** SETTERS ***/
@@ -120,16 +126,23 @@ public class Knapsack {
                     id = k.getIndex().get(i);
                     largest = benefitPerCost.get(i);
                 }
+                else if(benefitPerCost.get(i) == largest && k.getBenefits().get(index) < k.getBenefits().get(i)){
+                    index = i;
+                    id = k.getIndex().get(i);
+                    largest = benefitPerCost.get(i);
+                }
             }
             
             if((k.getTotalBenefitPerCost() + costs.get(index)) > k.getCapacity())
                 break;
             
-            /*
-            System.out.println("Largest : " + largest);
-            System.out.println("Index   : " + index);
-            System.out.println("Cost    : " + costs.get(index) + "\n");
-            */
+            
+            //System.out.println("Largest : " + largest);
+            //System.out.println("Index   : " + index);
+            //System.out.println("Cost    : " + costs.get(index) + "\n");
+            
+            //System.out.println("Mochila    : " + k.getTotalBenefitPerCost() + "\n");
+            //System.out.println("Cost    : " + costs.get(index) + "\n");
             
             k.setItem(id);
             k.setTotalBenefitPerCost(k.getTotalBenefitPerCost() + costs.get(index));
@@ -173,15 +186,18 @@ public class Knapsack {
         float pivot = k.getBenefitPerCost().get(start);
         
         while(left <= right) {
-            if(k.getBenefitPerCost().get(left) <= pivot) left++;
-            else if(k.getBenefitPerCost().get(right) > pivot) right--;
+            k.comparisons++;
+            if(k.getBenefitPerCost().get(left) > pivot) left++;
+            else if(k.getBenefitPerCost().get(right) <= pivot) right--;
             else if(left <= right) {
                 Swap(k, left, right);
+                k.swaps++;
                 left++;
                 right--;
             }
         }
         Swap(k, start, right);
+        k.swaps++;
         return right;
     }
     
@@ -255,43 +271,71 @@ public class Knapsack {
         /*
          *   Cálculos (Custo-Benefício)
          */
-        for(int i = 0; i < k.getBenefits().size(); i++)
-            k.setBenefitPerCost((float) k.getBenefits().get(i)/k.getCosts().get(i));
-        
-        System.out.println("Capacity of Knapsack: " + k.getCapacity());
+        for(int i = 0; i < k.getBenefits().size(); i++){
+            if(k.getCosts().get(i) == 0){
+                k.setBenefitPerCost((float) k.getBenefits().get(i));
+            }
+            else{
+                k.setBenefitPerCost((float) k.getBenefits().get(i)/k.getCosts().get(i));
+            }
+        }
+        //System.out.println("Capacity of Knapsack: " + k.getCapacity());
+        /*System.out.println("Capacity of Knapsack: " + k.getCapacity());
         System.out.println("Benefits : " + k.getBenefits());
         System.out.println("Costs    : " + k.getCosts());
         System.out.println("CB       : " + k.getBenefitPerCost());
-        System.out.println("Index    : " + k.getIndex());
+        System.out.println("Index    : " + k.getIndex());*/
         
+        //long startTime = System.currentTimeMillis();
+        // CÓDIGO
+        //long estimatedTime = System.currentTimeMillis() - startTime;
+        // System.out.println("\nTempo de Execução (s): " + (estimatedTime/1000) + "s");
+        
+        long startTime1 = System.currentTimeMillis();
         GreedyStrategy(k);
-        System.out.println("\nFirst Greedy...");
+        long estimatedTime1 = System.currentTimeMillis() - startTime1;
+        /*System.out.println("\nFirst Greedy...");
         System.out.println("CB       : " + k.getBenefitPerCost());
         System.out.println("Benefits : " + k.getBenefits());
         System.out.println("Costs    : " + k.getCosts());
-        System.out.println("Index    : " + k.getIndex());
+        System.out.println("Index    : " + k.getIndex());*/
         System.out.println("Total    : " + k.getTotalBenefitPerCost());
         k.setTotalBenefitPerCost(0);
         
         /*
          *   Otimização (utilizando QuickSort)
          */
+        
+        long startTime2 = System.currentTimeMillis();
         QuickSort(k, 0, k.getBenefitPerCost().size()-1);
-        System.out.println("\nOrdering CB...");
+        /*System.out.println("\nOrdering CB...");
         System.out.println("CB       : " + k.getBenefitPerCost());
         System.out.println("Benefits : " + k.getBenefits());
         System.out.println("Costs    : " + k.getCosts());
-        System.out.println("Index    : " + k.getIndex());
+        System.out.println("Index    : " + k.getIndex());*/
         
         /*
          *   Programação Gulosa
          */
         GreedyStrategy(k);
+        long estimatedTime2 = System.currentTimeMillis() - startTime2;
         
-        System.out.println("\nCB       : " + k.getBenefitPerCost());
+        String path = "C:\\Users\\andre\\OneDrive\\Documents\\Aula\\PAA\\BinaryKnapsackProblem-master\\ResulMochila.txt";
+        
+        File f1 = new File(path);
+        FileWriter fr = new FileWriter(f1, true);
+        BufferedWriter buffWrite = new BufferedWriter(fr);
+        
+        /*System.out.println("estimatedTime1: " + estimatedTime1);
+        System.out.println("estimatedTime2: " + estimatedTime2);*/
+        
+        //buffWrite.write("Mochila5000:\n" + "Knapsack: " + estimatedTime1 + "\nQuicksort:\n" + "Ordenado: " + estimatedTime2 + "\nSwaps:" + k.swaps + "\nComparacoes: " + k.comparisons + "\n\n");
+        buffWrite.close();
+        /*System.out.println("\nCB       : " + k.getBenefitPerCost());
         System.out.println("Items    : " + k.getItems());
         System.out.println("Total    : " + k.getTotalBenefitPerCost());
-        System.out.println("Index    : " + k.getIndex());
+        System.out.println("Index    : " + k.getIndex());*/
+        System.out.println("Total    : " + k.getTotalBenefitPerCost());
         
         //  HOW TO COUNT THE TIME:
         
